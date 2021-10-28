@@ -1,0 +1,1 @@
+target_sources(UrlBuster PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Debug.cpp)

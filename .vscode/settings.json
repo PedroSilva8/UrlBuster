@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        "**/build": true
+    },
+    "files.associations": {
+        "iostream": "cpp",
+        "ranges": "cpp",
+        "ostream": "cpp"
+    }
+}
