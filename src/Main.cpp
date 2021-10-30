@@ -17,15 +17,20 @@ int main(int ac, char **av) {
         { "u", "url" },
         { "d", "dictionary" },
         { "h", "help" },
-        { "t", "thread" }
+        { "t", "thread" },
+        { "o", "output" },
+        { "s", "save-type"}
     };
 
     ArgHandler::LoadArguments(ac, av);
 
     if (ArgHandler::GetArgument("help")) {
         UrlBuster::PrintHelp();
-        return 1;
+        return 0;
     }
+
+    ArgHandler::GetArgument("output", &UrlBuster::output);
+    ArgHandler::GetArgument("save-type", &UrlBuster::outputType);
 
     //Get URL
     if (!ArgHandler::GetArgument("url", &UrlBuster::url))
@@ -34,14 +39,13 @@ int main(int ac, char **av) {
     if (!ArgHandler::GetArgument("dictionary", &dictionaryPath))
         Debug::Error("Dictionary Missing");
     
+
     string threads;
     if (ArgHandler::GetArgument("thread", &threads) && Misc::isNumber(threads))
         UrlBuster::threadSize = stoi(threads);
     else
         UrlBuster::threadSize = thread::hardware_concurrency();
 
-    //Verify URL
-    //TODO: Above
     UrlBuster::Setup();
 
     //Get Dic

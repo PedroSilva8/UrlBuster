@@ -2,6 +2,8 @@
 #include "Debug.hpp"
 
 string UrlBuster::url = "";
+string UrlBuster::output;
+string UrlBuster::outputType;
 URL_TYPE UrlBuster::type = NONE;
 
 unsigned int UrlBuster::threadSize;
@@ -9,8 +11,10 @@ int UrlBuster::completedJobs;
 
 vector<string> UrlBuster::dictionary;
 vector<thread> UrlBuster::threads;
+vector<UrlStatus> UrlBuster::status;
 
 shared_mutex UrlBuster::jobIncreaserMutex;
+shared_mutex UrlBuster::addStatusMutex;
 
 void UrlBuster::Setup() {
     struct sockaddr_in sa;
@@ -29,10 +33,45 @@ void UrlBuster::Start() {
     int Length = dictionary.size() / threadSize;
 
     for (int i = 0; i < threadSize; i++)
-        threads.emplace_back(thread(Worker, i * Length, Length));
+        threads.emplace_back(thread(Worker, i * Length, (i + 1 == threadSize ? dictionary.size() - (i * Length) : Length)));
 
     while (completedJobs != dictionary.size())
         Debug::SafePrintFlush("\r\33[0m[" + to_string(completedJobs) + "/" + to_string(dictionary.size()) + "]");
+
+    //Double check
+    Debug::SafePrintFlush("\r\33[0m[" + to_string(completedJobs) + "/" + to_string(dictionary.size()) + "]\n");
+
+    for (int i = 0; i < threadSize; i++)
+        threads[i].join();
+
+    //Save output
+    if (output != "") {
+        //This can probably be optimized
+        if (outputType == "1") {
+            //Get All Status Codes
+            vector<int> codes;
+            for (UrlStatus stat : status)
+                codes.push_back(stat.code);
+
+            for (int code : codes) {
+                ofstream outfile(output + to_string(code) + ".log");
+
+                for (UrlStatus stat : status)
+                    if (code == stat.code)
+                        outfile << stat.url << std::endl;
+        
+                outfile.close();
+            }
+        }
+        else {
+            ofstream outfile(output + "output.log");
+
+            for (UrlStatus stat : status)
+                outfile << to_string(stat.code) + " - " + stat.url << std::endl;
+        
+            outfile.close();
+        }
+    }
 }
 
 void UrlBuster::Worker(int startIndex, int length) {
@@ -76,6 +115,10 @@ void UrlBuster::Worker(int startIndex, int length) {
                     Debug::SafePrint("\33[2K\33[32m\r" + to_string(responseCode) + " - " + dictionary[i]);
                 else
                     Debug::SafePrint("\33[2K\33[33m\r" + to_string(responseCode) + " - " + dictionary[i]);
+                
+                addStatusMutex.lock();
+                status.push_back({ url: dictionary[i],  code: responseCode });
+                addStatusMutex.unlock();
             }
         }
         else
@@ -96,4 +139,7 @@ void UrlBuster::PrintHelp() {
     printf("\t-d, --dictionary\t\t\t\tdictionary used by the program\n");
     printf("\t-t, --thread\t\t\t\tdefine how many threads the program uses\n");
     printf("\t-o, --output\t\t\t\tdefine where to output log\n");
+    printf("\t-s, --save-type\t\t\t\tdefine output save type\n");
+    printf("\t\t-s 0\tsave all into single output file");
+    printf("\t\t-s 1\tsave all into multiple output files named by status code");
 }

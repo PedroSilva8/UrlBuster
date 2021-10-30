@@ -7,6 +7,8 @@
         "ranges": "cpp",
         "ostream": "cpp",
         "shared_mutex": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "future": "cpp",
+        "iosfwd": "cpp"
     }
 }

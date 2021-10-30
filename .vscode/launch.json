@@ -15,7 +15,9 @@
                 "-d",
                 "${workspaceRoot}/build/UrlBuster.data",
                 "-o",
-                "${workspaceRoot}/build/"
+                "${workspaceRoot}/build/",
+                "-s",
+                "1"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
