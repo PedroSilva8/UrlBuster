@@ -6,6 +6,8 @@ string UrlBuster::output;
 string UrlBuster::outputType;
 URL_TYPE UrlBuster::type = NONE;
 
+int UrlBuster::waitTime;
+
 unsigned int UrlBuster::threadSize;
 int UrlBuster::completedJobs;
 
@@ -103,6 +105,8 @@ void UrlBuster::Worker(int startIndex, int length) {
         string encondedURL = finalUrl + "/" + curl_easy_escape(c, dictionary[i].data(), dictionary[i].length());
         curl_easy_setopt(c, CURLOPT_URL, encondedURL.data());
         
+        if (UrlBuster::waitTime != 0)
+            this_thread::sleep_for(chrono::milliseconds(UrlBuster::waitTime));
         //Setting curl_easy_perform directly on if causes all response codes to be 404... why?
         CURLcode res = curl_easy_perform(c);
         
@@ -139,7 +143,7 @@ void UrlBuster::PrintHelp() {
     printf("\t-d, --dictionary\t\t\t\tdictionary used by the program\n");
     printf("\t-t, --thread\t\t\t\tdefine how many threads the program uses\n");
     printf("\t-o, --output\t\t\t\tdefine where to output log\n");
-    printf("\t-s, --save-type\t\t\t\tdefine output save type\n");
+    printf("\t-ot, --output-type\t\t\t\tdefine output save type\n");
     printf("\t\t-s 0\tsave all into single output file");
     printf("\t\t-s 1\tsave all into multiple output files named by status code");
 }

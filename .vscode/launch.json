@@ -16,8 +16,10 @@
                 "${workspaceRoot}/build/UrlBuster.data",
                 "-o",
                 "${workspaceRoot}/build/",
+                "-ot",
+                "1",
                 "-s",
-                "1"
+                "1000"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

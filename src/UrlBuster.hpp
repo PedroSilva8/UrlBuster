@@ -7,6 +7,7 @@
 #include <thread>
 #include <iostream>
 #include <fstream>  
+#include <chrono>
 
 #include <arpa/inet.h>
 #include <curl/curl.h> 
@@ -30,6 +31,9 @@ public:
     static string url;
     static string output;
     static string outputType;
+
+    static int waitTime;
+
     static URL_TYPE type;
 
     static vector<string> dictionary;

@@ -19,7 +19,8 @@ int main(int ac, char **av) {
         { "h", "help" },
         { "t", "thread" },
         { "o", "output" },
-        { "s", "save-type"}
+        { "ot", "output-type"},
+        { "s", "slow-mode"}
     };
 
     ArgHandler::LoadArguments(ac, av);
@@ -30,7 +31,11 @@ int main(int ac, char **av) {
     }
 
     ArgHandler::GetArgument("output", &UrlBuster::output);
-    ArgHandler::GetArgument("save-type", &UrlBuster::outputType);
+    ArgHandler::GetArgument("output-type", &UrlBuster::outputType);
+
+    string slowMode;
+    if (ArgHandler::GetArgument("slow-mode", &slowMode) && Misc::isNumber(slowMode))
+        UrlBuster::waitTime = stoi(slowMode);
 
     //Get URL
     if (!ArgHandler::GetArgument("url", &UrlBuster::url))
