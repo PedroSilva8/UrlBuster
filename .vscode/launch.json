@@ -17,9 +17,7 @@
                 "-o",
                 "${workspaceRoot}/build/",
                 "-ot",
-                "1",
-                "-s",
-                "1000"
+                "1"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

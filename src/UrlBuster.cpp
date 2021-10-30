@@ -144,6 +144,7 @@ void UrlBuster::PrintHelp() {
     printf("\t-t, --thread\t\t\t\tdefine how many threads the program uses\n");
     printf("\t-o, --output\t\t\t\tdefine where to output log\n");
     printf("\t-ot, --output-type\t\t\t\tdefine output save type\n");
-    printf("\t\t-s 0\tsave all into single output file");
-    printf("\t\t-s 1\tsave all into multiple output files named by status code");
+    printf("\t\t-ot 0\tsave all into single output file");
+    printf("\t\t-ot 1\tsave all into multiple output files named by status code");
+    printf("\t-s, --slow-mode <argument>\t\t\t\twait x miliseconds before next request\n");
 }
