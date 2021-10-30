@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 
 #include "Debug.hpp"
+#include "Misc.hpp"
 #include "ArgHandler.hpp"
 
 using namespace std;
@@ -26,6 +27,7 @@ URL_TYPE type = NONE;
 int completedJobs;
 shared_mutex jobIncreaserMutex;
 shared_mutex lockWrite;
+unsigned int threadSize;
 
 void worker(int startIndex, int length) {
     //Setup Curl
@@ -86,33 +88,41 @@ void help() {
     printf("\t-h, --help\t\t\t\t\tdisplay this help\n");
     printf("\t-u, --url\t\t\t\t\ttarget url\n");
     printf("\t-d, --dictionary\t\t\t\tdictionary used by the program\n");
+    printf("\t-t, --thread\t\t\t\tdefine how many threads the program uses\n");
 }
 
 int main(int ac, char **av) {
 
+    //Setup ArgHandler
     string dictionaryPath = "";
 
     ArgHandler::argumentConverter = {
         { "u", "url" },
         { "d", "dictionary" },
-        { "h", "help" }
+        { "h", "help" },
+        { "t", "thread" }
     };
 
     ArgHandler::LoadArguments(ac, av);
 
-    string h;
-    if (ArgHandler::GetArgument("help", h)) {
+    if (ArgHandler::GetArgument("help")) {
         help();
         return 1;
     }
 
     //Get URL
-    if (!ArgHandler::GetArgument("url", url))
+    if (!ArgHandler::GetArgument("url", &url))
         Debug::Error("Missing URL Argument");
     
-    if (!ArgHandler::GetArgument("dictionary", dictionaryPath))
+    if (!ArgHandler::GetArgument("dictionary", &dictionaryPath))
         Debug::Error("Dictionary Missing");
     
+    string threads;
+    if (ArgHandler::GetArgument("thread", &threads) && Misc::isNumber(threads))
+        threadSize = stoi(threads);
+    else
+        threadSize = thread::hardware_concurrency();
+
     //Verify URL
     //TODO: Above
     struct sockaddr_in sa;
@@ -138,11 +148,10 @@ int main(int ac, char **av) {
     //Do Jobs
     cout << "Starting Check" << endl;
 
-    int Cores = 16;
-    int Length = dictionary.size() / Cores;
+    int Length = dictionary.size() / threadSize;
 
     vector<thread> ThreadVector;
-    for (int i = 0; i < Cores; i++)
+    for (int i = 0; i < threadSize; i++)
         ThreadVector.emplace_back(thread(worker, i * Length, Length));
 
     while (completedJobs != dictionary.size()) {

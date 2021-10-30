@@ -3,9 +3,10 @@
 map<string, string> ArgHandler::arguments = map<string, string>();
 map<string, string> ArgHandler::argumentConverter = map<string, string>();
 
-bool ArgHandler::GetArgument(string Argument, string &value) {
+bool ArgHandler::GetArgument(string Argument, string *value) {
     if (arguments.contains(Argument)) {
-        value = arguments[Argument];
+        if (value != nullptr)
+            *value = arguments[Argument];
         return true;
     }
     return false;
