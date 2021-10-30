@@ -13,7 +13,9 @@
                 "--url",
                 "192.168.2.206",
                 "-d",
-                "${workspaceRoot}/build/UrlBuster.data"
+                "${workspaceRoot}/build/UrlBuster.data",
+                "-o",
+                "${workspaceRoot}/build/"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

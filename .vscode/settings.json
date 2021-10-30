@@ -5,6 +5,8 @@
     "files.associations": {
         "iostream": "cpp",
         "ranges": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "shared_mutex": "cpp",
+        "fstream": "cpp"
     }
 }
