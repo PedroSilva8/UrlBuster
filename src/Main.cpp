@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 
 #include "Debug.hpp"
+#include "ArgHandler.hpp"
 
 using namespace std;
 
@@ -47,7 +48,7 @@ void worker(int startIndex, int length) {
     curl_easy_setopt(c, CURLOPT_TIMEOUT, 4 * 1000);
     curl_easy_setopt(c, CURLOPT_NOBODY, 1);
 
-    //Do Shit
+    //Make Request Check
     for (size_t i = startIndex; i < startIndex + length; i++) {
         //Set URL (NOTE: For some reasson setting url directly from const char* (when encondig) causes malformed URL, check later why and try to fix this)
         string encondedURL = finalUrl + "/" + curl_easy_escape(c, dictionary[i].data(), dictionary[i].length());
@@ -78,17 +79,39 @@ void worker(int startIndex, int length) {
     }    
 }
 
-int main(int ac, char *av[]) {
+void help() {
+    printf("Usage:\n");
+    printf("\tUrlBuster [options] -u <argument> -d <argument>\tcheck url using dictionary\n");
+    printf("Options:\n");
+    printf("\t-h, --help\t\t\t\t\tdisplay this help\n");
+    printf("\t-u, --url\t\t\t\t\ttarget url\n");
+    printf("\t-d, --dictionary\t\t\t\tdictionary used by the program\n");
+}
 
-    //Get URL
-    for(int i = 0; i < ac; i++) {
-        if ((string)av[i] == "--url" && i + 1 < ac) {
-            url = av[++i];
-        }
+int main(int ac, char **av) {
+
+    string dictionaryPath = "";
+
+    ArgHandler::argumentConverter = {
+        { "u", "url" },
+        { "d", "dictionary" },
+        { "h", "help" }
+    };
+
+    ArgHandler::LoadArguments(ac, av);
+
+    string h;
+    if (ArgHandler::GetArgument("help", h)) {
+        help();
+        return 1;
     }
 
-    if (url == "")
+    //Get URL
+    if (!ArgHandler::GetArgument("url", url))
         Debug::Error("Missing URL Argument");
+    
+    if (!ArgHandler::GetArgument("dictionary", dictionaryPath))
+        Debug::Error("Dictionary Missing");
     
     //Verify URL
     //TODO: Above
@@ -104,7 +127,7 @@ int main(int ac, char *av[]) {
     //Get Dic
     string l;
     
-    ifstream file("/home/autotechnocract/Code/Scripts/UrlBuster/build/UrlBuster.data");
+    ifstream file(dictionaryPath);
     
     if(!file.is_open())
         Debug::Error(strerror(errno));

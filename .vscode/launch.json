@@ -10,8 +10,10 @@
             "request": "launch",
             "program": "${workspaceRoot}/build/UrlBuster",
             "args": [
-              "--url",
-              "192.168.171.130"
+                "--url",
+                "192.168.2.206",
+                "-d",
+                "${workspaceRoot}/build/UrlBuster.data"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
