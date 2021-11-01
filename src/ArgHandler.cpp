@@ -15,9 +15,9 @@ bool ArgHandler::GetArgument(string Argument, string *value) {
 void ArgHandler::LoadArguments(int length, char** args) {
     for (int i = 0; i < length; i++) {
         string arg = args[i];
-        if (arg.rfind("--") == 0 && i + 1 < length)
-            arguments.insert(pair<string, string>(arg.substr(2, arg.size() - 2), args[++i]));
-        else if (arg.rfind("-") == 0 && i + 1 < length && argumentConverter.contains(arg.substr(1, arg.size() - 1)))
-            arguments.insert(pair<string, string>(argumentConverter[arg.substr(1, arg.size() - 1)], args[++i]));
+        if (arg[0] == '-') {
+            string subArg = arg.substr(arg[1] == '-' ? 2 : 1, arg.size() - arg[1] == '-' ? 2 : 1);
+            arguments.insert(pair<string, string>(subArg.size() != 1 ? subArg : argumentConverter[subArg], i + 1 < length && args[i + 1][0] != '-' ? args[++i] : ""));
+        }
     }
 }

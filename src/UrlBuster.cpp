@@ -141,10 +141,10 @@ void UrlBuster::PrintHelp() {
     printf("\t-h, --help\t\t\t\t\tdisplay this help\n");
     printf("\t-u, --url\t\t\t\t\ttarget url\n");
     printf("\t-d, --dictionary\t\t\t\tdictionary used by the program\n");
-    printf("\t-t, --thread\t\t\t\tdefine how many threads the program uses\n");
-    printf("\t-o, --output\t\t\t\tdefine where to output log\n");
+    printf("\t-t, --thread\t\t\t\t\tdefine how many threads the program uses\n");
+    printf("\t-o, --output\t\t\t\t\tdefine where to output log\n");
     printf("\t-ot, --output-type\t\t\t\tdefine output save type\n");
-    printf("\t\t-ot 0\tsave all into single output file");
-    printf("\t\t-ot 1\tsave all into multiple output files named by status code");
-    printf("\t-s, --slow-mode <argument>\t\t\t\twait x miliseconds before next request\n");
+    printf("\t\t-ot 0\t\t\t\t\tsave all into single output file\n");
+    printf("\t\t-ot 1\t\t\t\t\tsave all into multiple output files named by status code\n");
+    printf("\t-s, --slow-mode <argument>\t\t\twait x miliseconds before next request\n");
 }
