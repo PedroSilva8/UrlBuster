@@ -9,7 +9,7 @@ URL_TYPE UrlBuster::type = NONE;
 int UrlBuster::waitTime;
 
 unsigned int UrlBuster::threadSize;
-int UrlBuster::completedJobs;
+long unsigned int UrlBuster::completedJobs;
 
 vector<string> UrlBuster::dictionary;
 vector<thread> UrlBuster::threads;
@@ -22,7 +22,7 @@ void UrlBuster::Setup() {
     struct sockaddr_in sa;
     if (inet_pton(AF_INET, url.data(), &(sa.sin_addr)) == 1)
         type = IP;
-    else if (regex_match(url, regex("^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$")))
+    else if (regex_match(url, regex("^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$")))
         type = URL;
 
     if (type == NONE)
@@ -32,10 +32,10 @@ void UrlBuster::Setup() {
 void UrlBuster::Start() {
     cout << "Starting Check" << endl;
 
-    int Length = dictionary.size() / threadSize;
+    unsigned int Length = dictionary.size() / threadSize;
 
-    for (int i = 0; i < threadSize; i++)
-        threads.emplace_back(thread(Worker, i * Length, (i + 1 == threadSize ? dictionary.size() - (i * Length) : Length)));
+    for (unsigned int i = 0; i < threadSize; i++)
+        threads.emplace_back(thread(Worker, (WorkerData){ index: i * Length, length: (i + 1 == threadSize ? (unsigned int)dictionary.size() - (i * Length) : Length) }));
 
     while (completedJobs != dictionary.size())
         Debug::SafePrintFlush("\r\33[0m[" + to_string(completedJobs) + "/" + to_string(dictionary.size()) + "]");
@@ -43,7 +43,7 @@ void UrlBuster::Start() {
     //Double check
     Debug::SafePrintFlush("\r\33[0m[" + to_string(completedJobs) + "/" + to_string(dictionary.size()) + "]\n");
 
-    for (int i = 0; i < threadSize; i++)
+    for (unsigned int i = 0; i < threadSize; i++)
         threads[i].join();
 
     //Save output
@@ -76,7 +76,7 @@ void UrlBuster::Start() {
     }
 }
 
-void UrlBuster::Worker(int startIndex, int length) {
+void UrlBuster::Worker(WorkerData data) {
     //Setup Curl
     CURL *c = curl_easy_init(); 
 
@@ -100,7 +100,7 @@ void UrlBuster::Worker(int startIndex, int length) {
     int responseCode;
     
     //Make Request Checks
-    for (size_t i = startIndex; i < startIndex + length; i++) {
+    for (size_t i = data.index; i < data.index + data.length; i++) {
         //Set URL (NOTE: For some reasson setting url directly from const char* (when encondig) causes malformed URL, check later why and try to fix this)
         string encondedURL = finalUrl + "/" + curl_easy_escape(c, dictionary[i].data(), dictionary[i].length());
         curl_easy_setopt(c, CURLOPT_URL, encondedURL.data());

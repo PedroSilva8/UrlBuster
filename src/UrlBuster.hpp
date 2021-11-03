@@ -25,6 +25,10 @@ struct UrlStatus {
     int code;
 };
 
+struct WorkerData {
+    unsigned int index;
+    unsigned int length;
+};
 
 class UrlBuster {
 public:
@@ -41,14 +45,14 @@ public:
     static vector<UrlStatus> status;
 
     static unsigned int threadSize;
-    static int completedJobs;
+    static long unsigned int completedJobs;
 
     static shared_mutex jobIncreaserMutex;
     static shared_mutex addStatusMutex;
 
     static void Setup();
     static void Start();
-    static void Worker(int startIndex, int length);
+    static void Worker(WorkerData data);
     static void PrintHelp();
 };
 
